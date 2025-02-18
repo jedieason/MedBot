@@ -1,35 +1,50 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const chatLog = document.getElementById("chat-log");
-  const userInput = document.getElementById("user-input");
-  const sendButton = document.getElementById("send-button");
+import './gemini.js';
 
-  // 新增訊息至對話框
-  function appendMessage(sender, message) {
-    const msgElem = document.createElement("div");
-    msgElem.classList.add("chat-message", sender);
-    msgElem.textContent = message;
-    chatLog.appendChild(msgElem);
-    chatLog.scrollTop = chatLog.scrollHeight;
+document.addEventListener('DOMContentLoaded', () => {
+  const chatMessages = document.getElementById('chat-messages');
+  const userInput = document.getElementById('user-input');
+  const sendBtn = document.getElementById('send-btn');
+
+  function appendMessage(message, type) {
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add('message');
+    if (type === 'user') {
+      messageDiv.classList.add('user-message');
+    } else {
+      messageDiv.classList.add('ai-message');
+    }
+    messageDiv.textContent = message;
+    chatMessages.appendChild(messageDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
   }
 
-  // 傳送使用者訊息，並呼叫 gemini API
   async function sendMessage() {
     const text = userInput.value.trim();
     if (!text) return;
-    appendMessage("user", text);
-    userInput.value = "";
+    appendMessage(text, 'user');
+    userInput.value = '';
+
+    // 顯示等待效果
+    const loadingMessage = document.createElement('div');
+    loadingMessage.classList.add('message', 'ai-message');
+    loadingMessage.textContent = '...';
+    chatMessages.appendChild(loadingMessage);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
     try {
       const response = await window.generateExplanation(text);
-      appendMessage("assistant", response);
+      chatMessages.removeChild(loadingMessage);
+      appendMessage(response, 'ai');
     } catch (error) {
+      chatMessages.removeChild(loadingMessage);
+      appendMessage('發生錯誤，請稍後再試。', 'ai');
       console.error(error);
-      appendMessage("assistant", "發生錯誤，請稍後再試。");
     }
   }
 
-  sendButton.addEventListener("click", sendMessage);
-  userInput.addEventListener("keydown", e => {
-    if (e.key === "Enter") {
+  sendBtn.addEventListener('click', sendMessage);
+  userInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
       sendMessage();
     }
   });
