@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>流暢對話匡</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <div id="chat-window" class="chat-window">
+      <!-- 對話記錄將在此呈現 -->
+    </div>
+    <div class="input-area">
+      <textarea id="user-input" placeholder="請輸入訊息..." rows="2"></textarea>
+      <button id="send-btn">送出</button>
+    </div>
+  </div>
+
+  <!-- 先載入 gemini.js，注意 type="module" -->
+  <script type="module" src="gemini.js"></script>
+  <script type="module" src="script.js"></script>
+</body>
+</html>
