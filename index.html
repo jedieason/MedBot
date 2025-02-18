@@ -3,21 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>流暢對話匡</title>
+  <title>診間助理對話介面</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
-    <div id="chat-window" class="chat-window">
-      <!-- 對話記錄將在此呈現 -->
-    </div>
-    <div class="input-area">
-      <textarea id="user-input" placeholder="請輸入訊息..." rows="2"></textarea>
-      <button id="send-btn">送出</button>
+  <div class="chat-container">
+    <header class="chat-header">
+      <h2>診間助理</h2>
+    </header>
+    <div id="chat-log" class="chat-log"></div>
+    <div class="chat-input-container">
+      <input type="text" id="user-input" placeholder="請輸入訊息..." autocomplete="off">
+      <button id="send-button">送出</button>
     </div>
   </div>
-
-  <!-- 先載入 gemini.js，注意 type="module" -->
+  <!-- 載入 gemini.js，請記得它必須使用 type="module" -->
   <script type="module" src="gemini.js"></script>
   <script type="module" src="script.js"></script>
 </body>
