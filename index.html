@@ -80,6 +80,15 @@
   </style>
 </head>
 <body>
+  <!-- 設定 importmap，載入 @google/generative-ai -->
+  <script type="importmap">
+    {
+      "imports": {
+        "@google/generative-ai": "https://esm.run/@google/generative-ai"
+      }
+    }
+  </script>
+
   <div class="chat-container">
     <div class="chat-header">對話視窗</div>
     <div id="chatMessages" class="chat-messages"></div>
@@ -88,7 +97,9 @@
       <button id="sendBtn">送出</button>
     </div>
   </div>
-  <script type="module" src="gemini.js"></script>
+  
+  <!-- 引入 Gemini 模組 -->
+  <script type="module" src="gemini-setup.js"></script>
   <script>
     const chatMessages = document.getElementById('chatMessages');
     const userInput = document.getElementById('userInput');
