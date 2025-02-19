@@ -1,140 +1,27 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
-  <title>極美對話視窗</title>
-  <style>
-    body {
-      background: #f0f0f0;
-      font-family: "Helvetica Neue", Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-    }
-    .chat-container {
-      width: 90%;
-      max-width: 800px;
-      margin: 50px auto;
-      background: #fff;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      border-radius: 8px;
-      overflow: hidden;
-    }
-    .chat-header {
-      background: #3a8fb7;
-      color: #fff;
-      padding: 20px;
-      text-align: center;
-      font-size: 1.5em;
-    }
-    .chat-messages {
-      padding: 20px;
-      height: 400px;
-      overflow-y: auto;
-      background: #fafafa;
-    }
-    .message {
-      margin-bottom: 15px;
-      line-height: 1.4;
-    }
-    .message.user {
-      text-align: right;
-    }
-    .message.user .text {
-      background: #dcf8c6;
-      display: inline-block;
-      padding: 10px 15px;
-      border-radius: 15px;
-    }
-    .message.assistant .text {
-      background: #ececec;
-      display: inline-block;
-      padding: 10px 15px;
-      border-radius: 15px;
-    }
-    .chat-input {
-      border-top: 1px solid #ddd;
-      padding: 10px;
-      display: flex;
-      background: #fff;
-    }
-    .chat-input input {
-      flex: 1;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      font-size: 1em;
-    }
-    .chat-input button {
-      background: #3a8fb7;
-      color: #fff;
-      border: none;
-      padding: 10px 15px;
-      margin-left: 10px;
-      border-radius: 4px;
-      font-size: 1em;
-      cursor: pointer;
-    }
-    .chat-input button:hover {
-      background: #327ca1;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>診間助理聊天</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- 設定 importmap，載入 @google/generative-ai -->
-  <script type="importmap">
+    <div id="chat-container">
+        <div id="chat-log"></div>
+        <div id="input-area">
+            <textarea id="userMessage" placeholder="請輸入訊息..."></textarea>
+            <button id="sendButton">傳送</button>
+        </div>
+    </div>
+    <script type="importmap">
     {
       "imports": {
         "@google/generative-ai": "https://esm.run/@google/generative-ai"
       }
     }
-  </script>
-
-  <div class="chat-container">
-    <div class="chat-header">對話視窗</div>
-    <div id="chatMessages" class="chat-messages"></div>
-    <div class="chat-input">
-      <input type="text" id="userInput" placeholder="請輸入訊息..." />
-      <button id="sendBtn">送出</button>
-    </div>
-  </div>
-  
-  <!-- 引入 Gemini 模組 -->
-  <script type="module" src="gemini-setup.js"></script>
-  <script>
-    const chatMessages = document.getElementById('chatMessages');
-    const userInput = document.getElementById('userInput');
-    const sendBtn = document.getElementById('sendBtn');
-
-    // 顯示訊息於對話視窗
-    function addMessage(sender, text) {
-      const messageElem = document.createElement('div');
-      messageElem.classList.add('message', sender);
-      const textElem = document.createElement('div');
-      textElem.classList.add('text');
-      textElem.innerText = text;
-      messageElem.appendChild(textElem);
-      chatMessages.appendChild(messageElem);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    // 處理送出訊息
-    async function sendMessage() {
-      const userText = userInput.value.trim();
-      if (!userText) return;
-      addMessage('user', userText);
-      userInput.value = '';
-      try {
-        const response = await window.generateExplanation(userText);
-        addMessage('assistant', response);
-      } catch (err) {
-        addMessage('assistant', '錯誤：' + err.message);
-      }
-    }
-
-    sendBtn.addEventListener('click', sendMessage);
-    userInput.addEventListener('keyup', e => {
-      if (e.key === 'Enter') sendMessage();
-    });
-  </script>
+    </script>
+    <script type="module" src="gemini-setup.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
