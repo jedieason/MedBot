@@ -1,5 +1,3 @@
-/* style.css */
-
 /* Reset and Base Styles */
 * {
   box-sizing: border-box;
@@ -7,7 +5,7 @@
   padding: 0;
 }
 
-body, html {
+html, body {
   height: 100%;
   font-family: "Noto Sans TC", sans-serif;
   background-color: #f9f9f9;
@@ -69,37 +67,83 @@ body, html {
   word-break: break-word;
 }
 
-/* 輸入區塊 */
+/* 輸入區：參考 WeeGPTInputSection 風格 */
 #input-area {
   display: flex;
   align-items: center;
+  margin: 30px auto;
+  background-color: #f9f9fc;
+  border-radius: 24px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  border: 1px solid #e6e6eb;
+  transition: all 0.3s ease;
+  max-width: 800px;
 }
 
-/* 訊息輸入框 */
+/* 輸入文字框 */
 #userMessage {
-  flex: 1;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  flex-grow: 1;
+  padding: 15px 10px 15px 20px;
+  border: none;
   resize: none;
   font-size: 16px;
+  line-height: 1.5;
+  color: #2c2c3a;
+  background-color: transparent;
+  outline: none;
+}
+
+#userMessage::placeholder {
+  color: #a0a0b3;
+  transition: color 0.3s ease;
+}
+
+#userMessage:focus::placeholder {
+  color: #c0c0d0;
 }
 
 /* 傳送按鈕 */
 #sendButton {
-  margin-left: 10px;
-  padding: 10px 20px;
-  border: none;
-  background-color: #007bff;
+  width: 75px;
+  height: 40px;
+  background: linear-gradient(156deg, #006dff, #ff0909);
   color: #fff;
-  border-radius: 8px;
-  cursor: pointer;
+  border: none;
+  font-weight: 600;
   font-size: 16px;
-  transition: background-color 0.3s ease;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+  margin-right: 8px;
+  border-radius: 16px;
+  letter-spacing: 0.5px;
+  position: relative;
+  box-shadow: 0 4px 15px rgba(0, 130, 200, 0.3);
+}
+
+#sendButton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255,255,255,0.3), transparent);
+  transition: all 0.5s ease;
+}
+
+#sendButton:hover::before {
+  left: 100%;
 }
 
 #sendButton:hover {
-  background-color: #0056b3;
+  transform: scale(1.1) rotate(3deg);
+  box-shadow: 0 6px 20px rgba(0, 130, 200, 0.4);
+}
+
+#sendButton:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 10px rgba(0, 130, 200, 0.2);
 }
 
 /* 行動裝置響應式調整 */
@@ -107,9 +151,18 @@ body, html {
   #chat-container {
     padding: 10px;
   }
-
+  
+  #input-area {
+    margin: 20px;
+  }
+  
   #sendButton {
-    padding: 10px 15px;
+    width: 65px;
+    height: 35px;
+    font-size: 14px;
+  }
+  
+  #userMessage {
     font-size: 14px;
   }
 }
