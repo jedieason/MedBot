@@ -1,32 +1,71 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WeeGPT Chat</title>
-  <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <title>診間助理</title>
 </head>
 <body>
-  <div id="chat-container">
-    <div id="chat-header">
-      <div>
-        <h2 style="font-weight: 600;">診間助理</h2>
-        <small style="opacity: 0.7;">Powered by Weee Wee</small>
-      </div>
-    </div>
-    <div id="chat-messages"></div>
-    <div id="input-area">
-      <input type="text" id="user-input" placeholder="Ask WeeGPT..." maxlength="200">
-      <button id="send-btn">
-        Send
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="22" y1="2" x2="11" y2="13"></line>
-          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-        </svg>
-      </button>
-    </div>
-  </div>
-  <script type="module" src="script.js"></script>
+  <h1>診間助理</h1>
+  <div id="chatbox"></div>
+  <input type="text" id="userInput" placeholder="請輸入..." />
+  <button id="sendBtn">送出</button>
+
+  <script>
+    // 紀錄對話歷史（陣列），初始為空
+    let conversation = [];
+
+    const chatbox = document.getElementById("chatbox");
+    const userInput = document.getElementById("userInput");
+    const sendBtn = document.getElementById("sendBtn");
+
+    // 你的 AWS Lambda Endpoint
+    const API_ENDPOINT = "https://e2mftuefo5.execute-api.ap-southeast-2.amazonaws.com/default/Med-OpenAI-API";
+
+    sendBtn.addEventListener("click", async () => {
+      const message = userInput.value.trim();
+      if (!message) return;
+
+      // 將使用者訊息顯示在畫面上
+      appendMessage("user", message);
+      userInput.value = "";
+
+      try {
+        // 向 Lambda 發送 POST，並把「使用者當前訊息」和「既有對話」一起傳送
+        const response = await fetch(API_ENDPOINT, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            message,      // 當前使用者輸入
+            conversation, // 既有對話
+          }),
+        });
+
+        const data = await response.json();
+
+        // data.reply: AI 這次回應的文字
+        // data.conversation: 更新後的完整對話紀錄
+        if (data.reply) {
+          appendMessage("assistant", data.reply);
+        } else if (data.error) {
+          appendMessage("assistant", "Error: " + data.error);
+        }
+
+        // 用最新的對話歷史更新本地端 conversation
+        if (data.conversation) {
+          conversation = data.conversation;
+        }
+      } catch (err) {
+        appendMessage("assistant", "Error: " + err.message);
+      }
+    });
+
+    function appendMessage(role, text) {
+      const p = document.createElement("p");
+      p.textContent = `${role.toUpperCase()}: ${text}`;
+      chatbox.appendChild(p);
+    }
+  </script>
 </body>
 </html>
