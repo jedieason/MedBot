@@ -1,134 +1,129 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>對話視窗</title> 
+  <title>極美對話視窗</title>
   <style>
-    * { box-sizing: border-box; }
     body {
+      background: #f0f0f0;
+      font-family: "Helvetica Neue", Arial, sans-serif;
       margin: 0;
       padding: 0;
-      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-      background: linear-gradient(135deg, #74ABE2, #5563DE);
-      color: #333;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
     }
     .chat-container {
       width: 90%;
-      max-width: 600px;
-      background-color: #fff;
+      max-width: 800px;
+      margin: 50px auto;
+      background: #fff;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
       border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      display: flex;
-      flex-direction: column;
       overflow: hidden;
     }
     .chat-header {
-      background-color: #5563DE;
+      background: #3a8fb7;
       color: #fff;
-      padding: 16px;
+      padding: 20px;
       text-align: center;
-      font-size: 1.2em;
+      font-size: 1.5em;
     }
-    .chat-log {
-      flex: 1;
-      padding: 16px;
+    .chat-messages {
+      padding: 20px;
+      height: 400px;
       overflow-y: auto;
+      background: #fafafa;
     }
     .message {
-      margin-bottom: 12px;
+      margin-bottom: 15px;
       line-height: 1.4;
     }
     .message.user {
       text-align: right;
     }
-    .message.assistant {
-      text-align: left;
+    .message.user .text {
+      background: #dcf8c6;
+      display: inline-block;
+      padding: 10px 15px;
+      border-radius: 15px;
+    }
+    .message.assistant .text {
+      background: #ececec;
+      display: inline-block;
+      padding: 10px 15px;
+      border-radius: 15px;
     }
     .chat-input {
-      border-top: 1px solid #eee;
+      border-top: 1px solid #ddd;
+      padding: 10px;
       display: flex;
+      background: #fff;
     }
     .chat-input input {
       flex: 1;
-      padding: 12px 16px;
-      border: none;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
       font-size: 1em;
     }
     .chat-input button {
-      border: none;
-      background-color: #5563DE;
+      background: #3a8fb7;
       color: #fff;
-      padding: 0 20px;
-      cursor: pointer;
+      border: none;
+      padding: 10px 15px;
+      margin-left: 10px;
+      border-radius: 4px;
       font-size: 1em;
+      cursor: pointer;
     }
     .chat-input button:hover {
-      background-color: #4450c4;
+      background: #327ca1;
     }
   </style>
 </head>
 <body>
   <div class="chat-container">
-    <div class="chat-header">精美對話視窗</div>
-    <div id="chatLog" class="chat-log"></div>
+    <div class="chat-header">對話視窗</div>
+    <div id="chatMessages" class="chat-messages"></div>
     <div class="chat-input">
-      <input type="text" id="userInput" placeholder="請輸入訊息…" autocomplete="off">
+      <input type="text" id="userInput" placeholder="請輸入訊息..." />
       <button id="sendBtn">送出</button>
     </div>
   </div>
-  
-  <!-- 引入 gemini.js 模組 -->
-  <script type="module">
-    import { generateExplanation, conversationHistory } from './gemini.js';
-    
-    const chatLogEl = document.getElementById("chatLog");
-    const userInputEl = document.getElementById("userInput");
-    const sendBtn = document.getElementById("sendBtn");
+  <script type="module" src="gemini.js"></script>
+  <script>
+    const chatMessages = document.getElementById('chatMessages');
+    const userInput = document.getElementById('userInput');
+    const sendBtn = document.getElementById('sendBtn');
 
-    // 更新畫面：依據 conversationHistory 呈現所有對話
-    function updateChatLog() {
-      chatLogEl.innerHTML = "";
-      conversationHistory.forEach(entry => {
-        const msgDiv = document.createElement("div");
-        msgDiv.className = "message " + (entry.role === "user" ? "user" : "assistant");
-        msgDiv.textContent = (entry.role === "user" ? "使用者：" : "診間助理：") + entry.content;
-        chatLogEl.appendChild(msgDiv);
-      });
-      chatLogEl.scrollTop = chatLogEl.scrollHeight;
+    // 顯示訊息於對話視窗
+    function addMessage(sender, text) {
+      const messageElem = document.createElement('div');
+      messageElem.classList.add('message', sender);
+      const textElem = document.createElement('div');
+      textElem.classList.add('text');
+      textElem.innerText = text;
+      messageElem.appendChild(textElem);
+      chatMessages.appendChild(messageElem);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    async function handleSend() {
-      const text = userInputEl.value.trim();
-      if (!text) return;
-      
-      // 將使用者輸入直接更新畫面
-      conversationHistory.push({role: "user", content: text});
-      updateChatLog();
-      userInputEl.value = "";
-      
+    // 處理送出訊息
+    async function sendMessage() {
+      const userText = userInput.value.trim();
+      if (!userText) return;
+      addMessage('user', userText);
+      userInput.value = '';
       try {
-        const responseText = await generateExplanation(text);
-        updateChatLog();
-      } catch (error) {
-        // 錯誤訊息直接呈現在對話視窗
-        conversationHistory.push({role: "assistant", content: "產生回應時發生錯誤。"});
-        updateChatLog();
+        const response = await window.generateExplanation(userText);
+        addMessage('assistant', response);
+      } catch (err) {
+        addMessage('assistant', '錯誤：' + err.message);
       }
     }
-    
-    sendBtn.addEventListener("click", handleSend);
-    userInputEl.addEventListener("keypress", function(e) {
-      if (e.key === "Enter") handleSend();
+
+    sendBtn.addEventListener('click', sendMessage);
+    userInput.addEventListener('keyup', e => {
+      if (e.key === 'Enter') sendMessage();
     });
-    
-    // 初始化對話：可以在這裡先加入一則歡迎訊息
-    conversationHistory.push({role: "assistant", content: "您好，請提供您的病徵、發病日期與發病部位。"});
-    updateChatLog();
   </script>
 </body>
 </html>
