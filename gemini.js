@@ -1,8 +1,8 @@
-import { GoogleGenerativeAI, HarmBlockThreshold, HarmCategory } from "@google/generative-ai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const API_KEY = "AIzaSyBNSAN553F5bmfDl3Z9PipiQWRS02MaNuI";
-// 建立全域對話記錄，儲存使用者和助手的訊息
-const conversationHistory = [];
+// 全域對話記錄，儲存使用者和助手的訊息
+export const conversationHistory = [];
 
 const genAI = new GoogleGenerativeAI(API_KEY);
 const model = genAI.getGenerativeModel({ 
@@ -24,13 +24,12 @@ function buildHistoryPrompt() {
 }
 
 // 修改後的 generateExplanation 函式
-window.generateExplanation = async function( userQuestion) {
+export async function generateExplanation(userQuestion) {
     // 將新的使用者問題加入對話記錄
     conversationHistory.push({role: "user", content: userQuestion});
     
     // 將對話記錄轉成字串
     const historyPrompt = buildHistoryPrompt();
-
 
     // 建立包含歷史對話的 prompt
     const prompt = `以下是對話歷程：\n${historyPrompt}\n\n請繼續提出接續問題：\n${userQuestion}`;
@@ -38,8 +37,6 @@ window.generateExplanation = async function( userQuestion) {
     try {
         // 呼叫 generateContent
         const result = await model.generateContent([prompt]);
-
-        // Log AI 回應以供除錯
         console.log('AI Response:', result);
 
         if (result && result.response) {
@@ -54,4 +51,4 @@ window.generateExplanation = async function( userQuestion) {
         console.error('Error fetching AI response:', error);
         throw new Error("在生成解釋時發生錯誤。");
     }
-};
+}
