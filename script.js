@@ -32,3 +32,9 @@ document.addEventListener("DOMContentLoaded", () => {
   initMsgDiv.textContent = "您好，方便請問有什麼地方不舒服嗎？";
   chatLog.appendChild(initMsgDiv);
 });
+
+const textarea = document.getElementById('userMessage');
+textarea.addEventListener('input', function () {
+  this.style.height = 'auto';            // 重設高度
+  this.style.height = this.scrollHeight + 'px'; // 依內容自動增高
+});
