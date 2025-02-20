@@ -7,7 +7,7 @@ document.getElementById("sendButton").addEventListener("click", async () => {
     // 顯示使用者訊息
     const userMsgDiv = document.createElement("div");
     userMsgDiv.className = "user-message";
-    userMsgDiv.textContent = `使用者：${userMessage}`;
+    userMsgDiv.textContent = `${userMessage}`;
     chatLog.appendChild(userMsgDiv);
     userMessageInput.value = "";
     
@@ -15,7 +15,7 @@ document.getElementById("sendButton").addEventListener("click", async () => {
         const assistantResponse = await window.sendMessage(userMessage);
         const assistantMsgDiv = document.createElement("div");
         assistantMsgDiv.className = "assistant-message";
-        assistantMsgDiv.textContent = `診間助理：${assistantResponse}`;
+        assistantMsgDiv.textContent = `${assistantResponse}`;
         chatLog.appendChild(assistantMsgDiv);
     } catch (error) {
         const errorMsgDiv = document.createElement("div");
