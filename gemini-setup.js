@@ -27,7 +27,7 @@ function sendFinalMedicalReport(finalReport) {
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: new URLSearchParams({ content: content })
+        body: new URLSearchParams({ content: finalReport })
     })
     .then(response => response.text())
     .then(data => {
