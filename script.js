@@ -32,22 +32,3 @@ document.addEventListener("DOMContentLoaded", () => {
   initMsgDiv.textContent = "您好，方便請問有什麼地方不舒服嗎？";
   chatLog.appendChild(initMsgDiv);
 });
-
-
-// 添加到你的 script.js 文件中
-const textarea = document.getElementById('userMessage');
-
-// 自動調整文字框高度的函數
-function autoResize() {
-    textarea.style.height = 'auto'; // 重置高度
-    textarea.style.height = textarea.scrollHeight + 'px'; // 設置新高度
-}
-
-// 監聽輸入事件
-textarea.addEventListener('input', autoResize);
-
-// 監聽窗口改變大小事件
-window.addEventListener('resize', autoResize);
-
-// 初始化
-autoResize();
