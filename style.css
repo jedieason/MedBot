@@ -38,7 +38,7 @@ body {
   background-color: #fff;
   border: 1px solid #eee;
   border-radius: 16px;
-  margin-bottom: 5px;
+  margin-bottom: 20px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
   scroll-behavior: smooth;
 }
@@ -231,11 +231,11 @@ body {
   }
   #chat-log {
     padding: 16px;
+    margin-bottom: 5px;
   }
   .user-message,
   .assistant-message {
     max-width: 100%;
-    font-size: 14px;
     padding: 10px 14px;
     margin-bottom: 14px;
   }
@@ -243,12 +243,10 @@ body {
     padding: 6px 12px;
   }
   #userMessage {
-    font-size: 14px;
     padding: 10px;
   }
   #sendButton {
     min-width: 70px;
     height: 36px;
-    font-size: 14px;
   }
 }
