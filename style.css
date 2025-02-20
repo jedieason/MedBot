@@ -38,7 +38,7 @@ body {
   background-color: #fff;
   border: 1px solid #eee;
   border-radius: 16px;
-  margin-bottom: 20px;
+  margin-bottom: 5px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
   scroll-behavior: smooth;
 }
