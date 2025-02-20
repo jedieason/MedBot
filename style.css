@@ -1,87 +1,94 @@
+/* 全局設定與重置 */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   font-family: "Noto Sans TC", sans-serif;
-  background-color: #f5f5f7;
+  background-color: #f9f9fa; /* 淡色背景，類似Pinterest乾淨的感覺 */
   color: #333;
+  overflow-x: hidden; /* 避免水平捲軸 */
 }
 
-/* Chat Container */
+/* Chat 容器 */
 #chat-container {
-  max-width: 800px;
-  margin: 0 auto;
+  /* 控制整體寬度，避免內容太少時過於分散 */
+  width: 90%;
+  max-width: 680px; 
+  margin: 40px auto;
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  min-height: 80vh; /* 讓區塊有一定高度，不會太矮 */
   padding: 20px;
   animation: fadeIn 0.5s ease-out;
 }
 
-/* Chat Log Area */
+/* 聊天內容區（做類似卡片清爽背景） */
 #chat-log {
   flex: 1;
   overflow-y: auto;
   padding: 20px;
-  background-color: rgba(255, 255, 255, 0.95);
-  border: 1px solid rgba(221, 221, 221, 0.5);
+  background-color: #fff;
+  border: 1px solid #eee;
   border-radius: 16px;
   margin-bottom: 20px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
   scroll-behavior: smooth;
 }
 
+/* 捲軸美化 */
 #chat-log::-webkit-scrollbar {
   width: 6px;
 }
-
 #chat-log::-webkit-scrollbar-track {
   background: rgba(0, 0, 0, 0.05);
   border-radius: 3px;
 }
-
 #chat-log::-webkit-scrollbar-thumb {
   background: rgba(0, 0, 0, 0.1);
   border-radius: 3px;
   transition: background 0.3s;
 }
-
 #chat-log::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 0, 0, 0.2);
 }
 
-/* Message Bubbles */
-.user-message, .assistant-message {
-  padding: 12px 18px;
-  border-radius: 16px;
+/* 訊息泡泡（限制寬度，避免文字太寬） */
+.user-message, 
+.assistant-message {
+  display: inline-block;
+  padding: 14px 18px;
   margin-bottom: 16px;
-  max-width: 75%;
+  border-radius: 16px;
+  max-width: 80%; /* 不讓訊息佔滿整個區域 */
   word-break: break-word;
   line-height: 1.5;
   position: relative;
   animation: messageSlide 0.3s ease-out;
 }
 
+/* 使用者訊息（右側） */
 .user-message {
-  background: linear-gradient(135deg, #007AFF, #00C6FF);
-  color: white;
+  background: linear-gradient(135deg, #FF7E7E, #FFB2B2);
+  color: #fff;
   margin-left: auto;
-  box-shadow: 0 2px 10px rgba(0, 122, 255, 0.1);
+  box-shadow: 0 2px 10px rgba(255, 126, 126, 0.2);
 }
 
+/* 助手訊息（左側） */
 .assistant-message {
-  background: white;
+  background: #fff;
   color: #333;
   margin-right: auto;
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border: 1px solid #eee;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
-/* Message Animations */
+/* 訊息動畫 */
 @keyframes messageSlide {
   from {
     opacity: 0;
@@ -93,6 +100,7 @@ html, body {
   }
 }
 
+/* 淡入動畫 */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -102,7 +110,7 @@ html, body {
   }
 }
 
-/* Error Message */
+/* 錯誤訊息 */
 .error-message {
   background: linear-gradient(135deg, #FF6B6B, #FF8E8E);
   color: white;
@@ -120,25 +128,25 @@ html, body {
   75% { transform: translateX(5px); }
 }
 
-/* Input Area */
+/* 輸入區域 */
 #input-area {
   display: flex;
   align-items: center;
-  background: rgba(255, 255, 255, 0.95);
+  background: #fff;
   border-radius: 20px;
-  padding: 8px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  padding: 8px 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.07);
   transition: all 0.3s ease;
 }
 
 #input-area:focus-within {
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
   transform: translateY(-2px);
 }
 
-/* Input TextField */
+/* 輸入框（自動撐滿空間，乾淨的邊框設計） */
 #userMessage {
-  flex-grow: 1;
+  flex: 1;
   padding: 12px 16px;
   border: none;
   border-radius: 16px;
@@ -160,21 +168,22 @@ html, body {
   color: #ccc;
 }
 
-/* Send Button */
+/* 送出按鈕 */
 #sendButton {
   min-width: 80px;
   height: 40px;
-  background: linear-gradient(135deg, #007AFF, #00C6FF);
+  background: linear-gradient(135deg, #ff7e7e, #ffb2b2);
   color: white;
   border: none;
   border-radius: 12px;
   font-weight: 600;
   font-size: 15px;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   margin-left: 8px;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 4px 15px rgba(255, 126, 126, 0.3);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 #sendButton::after {
@@ -192,7 +201,6 @@ html, body {
 
 #sendButton:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);
 }
 
 #sendButton:hover::after {
@@ -203,38 +211,10 @@ html, body {
   transform: translateY(1px);
 }
 
-/* Mobile Responsive */
-@media (max-width: 600px) {
-  #chat-container {
-    padding: 12px;
-  }
-
-  .user-message, .assistant-message {
-    max-width: 85%;
-    padding: 10px 14px;
-    font-size: 14px;
-  }
-
-  #input-area {
-    margin: 10px 0;
-    padding: 6px;
-  }
-
-  #userMessage {
-    padding: 10px 12px;
-    font-size: 14px;
-  }
-
-  #sendButton {
-    min-width: 70px;
-    height: 36px;
-    font-size: 14px;
-  }
-}
-
-/* Loading Animation */
+/* 載入中動畫（打字指示） */
 .typing-indicator {
   display: flex;
+  align-items: center;
   padding: 8px;
   gap: 4px;
   opacity: 0.7;
@@ -243,7 +223,7 @@ html, body {
 .typing-indicator span {
   width: 6px;
   height: 6px;
-  background: #007AFF;
+  background: #ff7e7e;
   border-radius: 50%;
   animation: typing 1s infinite;
 }
@@ -252,6 +232,40 @@ html, body {
 .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
 
 @keyframes typing {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+/* 手機響應式 */
+@media (max-width: 600px) {
+  #chat-container {
+    margin: 20px auto;
+    padding: 12px;
+  }
+  #chat-log {
+    padding: 16px;
+  }
+  .user-message,
+  .assistant-message {
+    max-width: 100%;
+    font-size: 14px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+  }
+  #input-area {
+    padding: 6px 12px;
+  }
+  #userMessage {
+    font-size: 14px;
+    padding: 10px;
+  }
+  #sendButton {
+    min-width: 70px;
+    height: 36px;
+    font-size: 14px;
+  }
 }
