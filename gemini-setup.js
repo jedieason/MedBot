@@ -13,12 +13,11 @@ const model = genAI.getGenerativeModel({
         topK: 20,
     },
     systemInstruction:
-        "你是診所的診間助理，你的目的是透過LPQQOPERA問診方法（位置、性質、程度/強度、起始時間、誘因與緩解因素、症狀變化、相關個人與家族病史）提問出使用者的疾病相關資訊，並詢問是否有想補充說明的，你只負責透過逐步提問求出你需要的資訊（要分次提問不要一次全部問在同一個問題），並保持親切卻專業嚴謹地口吻，不用每次都從您好開頭，直接提出您的問題即可，你不會回答任何其他的問題且你不會提供醫療建議。僅使用正體中文（臺灣）回答，且禁止使用粗體、斜體等格式化，使用親切的口吻。當你搜集完所有資料後，請依照以下格式整理（不要增加額外的東西，提供你認為的初步診斷）：\n病歷簡介：\n    病徵：\n    發病部位：\n    發病日期：\n    症狀性質：\n    症狀程度：\n    誘因與緩解因素：\n    症狀變化：\n    相關症狀：\n    相關個人與家族病史：\n    其他疑問：\n    初步診斷：",
+        "你是診所的診間助理，你的目的是透過LPQQOPERA問診方法（位置、性質、程度/強度、起始時間、誘因與緩解因素、症狀變化、相關個人與家族病史）提問出使用者的疾病相關資訊，並詢問是否有想補充說明的，你只負責透過逐步提問求出你需要的資訊（要分次提問不要一次全部問在同一個問題），並保持親切卻專業嚴謹地口吻，不用每次都從您好開頭，直接提出您的問題即可，你不會回答任何其他的問題且你不會提供醫療建議。僅使用正體中文（臺灣）回答，且禁止使用粗體、斜體等格式化，使用親切的口吻。當你搜集完所有資料後，請依照以下格式整理（不要增加額外的東西，提供你認為的初步診斷）：\n病歷簡介：\n    候位號碼：\n    姓名：\n    病徵：\n    發病部位：\n    發病日期：\n    症狀性質：\n    症狀程度：\n    誘因與緩解因素：\n    症狀變化：\n    相關症狀：\n    相關個人與家族病史：\n    其他疑問：\n    初步診斷：\n",
 });
 
-let conversationHistory = "診間助理：您好，方便請問有什麼地方不舒服嗎？";
+let conversationHistory = "診間助理：您好，方便請問您的候位號碼與姓名嗎？";
 
-// 新增一個函數處理最終整理內容的傳遞（例如上傳、或呼叫其他模組）
 function sendFinalMedicalReport(finalReport) {
     const url = 'https://script.google.com/macros/s/AKfycbypoBJyxKh436VSYk_PFyaWoVuK-BuBezOCkxuhhm28GcR68jHwMyIHK7EG5Gge_SCfhQ/exec';
 
@@ -31,7 +30,7 @@ function sendFinalMedicalReport(finalReport) {
     })
     .then(response => response.text())
     .then(data => {
-        console.log(data); // Log the response from the server
+        console.log(data);
     })
     .catch(error => {
         console.error('Error:', error);
@@ -53,7 +52,9 @@ window.sendMessage = async function (userMessage) {
             if (trimmedResponse.includes("病歷簡介：")) {
                 sendFinalMedicalReport(trimmedResponse);
                 conversationHistory += "診間助理：感謝您提供完整資訊，我們已完成資料整理。\n";
-                return "感謝您提供完整資訊，我們已完成資料整理。";
+                const inputArea = document.getElementById("input-area");
+                inputArea.innerHTML = '感謝您提供完整資訊，請稍待片刻等待就診。另外在候位之餘想邀請您<a href="http://www.example.com" target="_blank">點此</a>回饋您的使用體驗！';
+                return "感謝您！";
             } else {
                 conversationHistory += `診間助理：${trimmedResponse}\n`;
                 return trimmedResponse;

@@ -1,7 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Playfair+Display:wght@400;600&display=swap');
+
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  font-family: "source-han-serif-tc", "Noto Serif TC", "PMingLiU", "SimSun", serif;
 }
 
 html,
@@ -15,7 +18,7 @@ body {
 
 #chat-container {
   position: fixed;
-  top: 0;
+  top: 70px;
   left: 0;
   right: 0;
   bottom: 0;
@@ -27,18 +30,22 @@ body {
 }
 
 #top-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
   display: flex;
   align-items: center;
   justify-content: space-between;
   background: #fff;
-  padding: 10px 20px;
-  border-bottom: 1px solid #eee;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px; /* 與下方內容間隔 */
+  height: 70px;
+  padding: 20px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
 }
 
 #top-bar .logo img {
-  height: 40px; /* 可依診所Logo調整 */
+  height: 45px;
 }
 
 #top-bar .waiting-number {
@@ -139,7 +146,6 @@ body {
   transform: translateY(-2px);
 }
 
-/* 輸入框 */
 #userMessage {
   flex: 1;
   padding: 12px 16px;
@@ -164,7 +170,6 @@ body {
   color: #ccc;
 }
 
-/* 送出按鈕 */
 #sendButton {
   min-width: 80px;
   height: 40px;
