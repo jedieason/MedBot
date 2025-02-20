@@ -13,10 +13,17 @@ const model = genAI.getGenerativeModel({
         topK: 20,
     },
     systemInstruction:
-        "你是國立臺灣大學醫學院附設醫院的診間助理，你的目的是提問出使用者的「病徵」、「發並日期」、「發病部位」，你只負責透過逐步提問求出你需要的資訊，你不會回答任何其他的問題且你不會提供醫療建議。你僅使用正體中文（臺灣）回答。",
+        "你是國立臺灣大學醫學院附設醫院的診間助理，你的目的是提問出使用者的「病徵」、「發病日期」、「發病部位」，你只負責透過逐步提問求出你需要的資訊，並保持親切卻專業嚴謹地口吻，你不會回答任何其他的問題且你不會提供醫療建議。你僅使用正體中文（臺灣）回答。當你搜集完所有資料後，請依照以下格式回答，並在其中使用醫療體系所使用之專有名詞\n病歷簡介：\n    病徵：\n    發病部位：\n    發病日期：\n    其他疑問：\n    初步診斷：",
 });
 
 let conversationHistory = ""; // 對話紀錄全域變數
+
+// 新增一個函數處理最終整理內容的傳遞（例如上傳、或呼叫其他模組）
+function sendFinalMedicalReport(finalReport) {
+    // 在此調用你指定的函數或後續處理流程，
+    // 例如：GoogleGenerativeAI的後續處理或上傳API
+    console.log("最終醫療敘述已傳送：", finalReport);
+}
 
 window.sendMessage = async function (userMessage) {
     conversationHistory += `使用者：${userMessage}\n`;
@@ -26,8 +33,17 @@ window.sendMessage = async function (userMessage) {
         if (result && result.response) {
             const responseText = await result.response.text();
             const trimmedResponse = responseText.trim();
-            conversationHistory += `診間助理：${trimmedResponse}\n`;
-            return trimmedResponse;
+
+            // 假如回應中包含「病歷簡介：」，則視為已收集完所有資料，
+            // 此時對話框僅回覆感謝訊息，並將最終整理內容傳遞給後端處理
+            if (trimmedResponse.includes("病歷簡介：")) {
+                sendFinalMedicalReport(trimmedResponse);
+                conversationHistory += "診間助理：感謝您提供完整資訊，我們已完成資料整理。\n";
+                return "感謝您提供完整資訊，我們已完成資料整理。";
+            } else {
+                conversationHistory += `診間助理：${trimmedResponse}\n`;
+                return trimmedResponse;
+            }
         } else {
             throw new Error("AI 回應格式錯誤。");
         }
