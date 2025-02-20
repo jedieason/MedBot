@@ -20,8 +20,23 @@ let conversationHistory = ""; // 對話紀錄全域變數
 
 // 新增一個函數處理最終整理內容的傳遞（例如上傳、或呼叫其他模組）
 function sendFinalMedicalReport(finalReport) {
-    // 在此調用你指定的函數或後續處理流程，
-    // 例如：GoogleGenerativeAI的後續處理或上傳API
+    const url = 'https://script.google.com/macros/s/AKfycbypoBJyxKh436VSYk_PFyaWoVuK-BuBezOCkxuhhm28GcR68jHwMyIHK7EG5Gge_SCfhQ/exec';
+
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({ content: content })
+    })
+    .then(response => response.text())
+    .then(data => {
+        console.log(data); // Log the response from the server
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showCustomAlert('Failed to send content to Google Docs.');
+    });
     console.log("最終醫療敘述已傳送：", finalReport);
 }
 
