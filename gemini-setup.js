@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const API_KEY = "AIzaSyBNSAN553F5bmfDl3Z9PipiQWRS02MaNuI"; // 前端金鑰
+const API_KEY = "AIzaSyBNSAN553F5bmfDl3Z9PipiQWRS02MaNuI";
 
 // 初始化 Gemini API
 const genAI = new GoogleGenerativeAI(API_KEY);
@@ -16,7 +16,7 @@ const model = genAI.getGenerativeModel({
         "你是診所的診間助理，你的目的是提問出使用者的「病徵」、「發病日期」、「發病部位」，你只負責透過逐步提問求出你需要的資訊，並保持親切卻專業嚴謹地口吻，你不會回答任何其他的問題且你不會提供醫療建議。你僅使用正體中文（臺灣）回答，且禁止使用粗體、斜體等格式化，使用親切的口吻。當你搜集完所有資料後，請依照以下格式整理：\n病歷簡介：\n    病徵：\n    發病部位：\n    發病日期：\n    其他疑問：\n    初步診斷：",
 });
 
-let conversationHistory = ""; // 對話紀錄全域變數
+let conversationHistory = "診間助理：您好，方便請問有什麼地方不舒服嗎？";
 
 // 新增一個函數處理最終整理內容的傳遞（例如上傳、或呼叫其他模組）
 function sendFinalMedicalReport(finalReport) {
