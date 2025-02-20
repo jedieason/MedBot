@@ -26,6 +26,27 @@ body {
   background-color: #f9f9fa;
 }
 
+#top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  padding: 10px 20px;
+  border-bottom: 1px solid #eee;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px; /* 與下方內容間隔 */
+}
+
+#top-bar .logo img {
+  height: 40px; /* 可依診所Logo調整 */
+}
+
+#top-bar .waiting-number {
+  font-size: 16px;
+  color: #333;
+  font-weight: bold;
+}
+
 #chat-log {
   display: flex;
   flex-direction: column;
@@ -103,7 +124,6 @@ body {
   }
 }
 
-/* 輸入區域 */
 #input-area {
   display: flex;
   align-items: center;
