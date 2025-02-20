@@ -9,28 +9,31 @@ html,
 body {
   height: 100%;
   font-family: "Noto Sans TC", sans-serif;
-  background-color: #f9f9fa; /* 淡色背景，類似Pinterest乾淨的感覺 */
+  background-color: #f9f9fa; /* 類似Pinterest的乾淨背景 */
   color: #333;
   overflow-x: hidden; /* 避免水平捲軸 */
 }
 
 /* Chat 容器 */
 #chat-container {
-  /* 控制整體寬度，避免內容太少時過於分散 */
   width: 90%;
-  max-width: 680px; 
-  margin: 40px auto;
+  max-width: 680px;
+  margin: 40px auto; /* 讓區塊置中 */
   display: flex;
   flex-direction: column;
-  min-height: 80vh; /* 讓區塊有一定高度，不會太矮 */
+  min-height: 80vh;
   padding: 20px;
   animation: fadeIn 0.5s ease-out;
 }
 
-/* 聊天內容區（做類似卡片清爽背景） */
+/* 聊天內容區 - 卡片風格背景 */
 #chat-log {
-  flex: 1;
-  overflow-y: auto;
+  /* 關鍵：改為 flex 布局 + 垂直排列，讓訊息可以各自成 row */
+  display: flex;
+  flex-direction: column;
+  
+  flex: 1;              /* 撐滿剩餘空間 */
+  overflow-y: auto;     /* 可上下捲動 */
   padding: 20px;
   background-color: #fff;
   border: 1px solid #eee;
@@ -57,35 +60,34 @@ body {
   background: rgba(0, 0, 0, 0.2);
 }
 
-/* 訊息泡泡（限制寬度，避免文字太寬） */
-.user-message, 
+/* 訊息泡泡設定：大小、陰影、動態 */
+.user-message,
 .assistant-message {
-  display: inline-block;
   padding: 14px 18px;
   margin-bottom: 16px;
   border-radius: 16px;
-  max-width: 80%; /* 不讓訊息佔滿整個區域 */
-  word-break: break-word;
+  max-width: 80%;         /* 避免訊息過寬，保留適度空白 */
+  word-break: break-word; /* 長字換行 */
   line-height: 1.5;
   position: relative;
   animation: messageSlide 0.3s ease-out;
 }
 
-/* 使用者訊息（右側） */
+/* 使用者訊息：對齊右側 */
 .user-message {
-  background: linear-gradient(135deg, #FF7E7E, #FFB2B2);
+  align-self: flex-end;   /* 置於右側 */
+  background: linear-gradient(135deg, #36D1DC, #5B86E5);
   color: #fff;
-  margin-left: auto;
-  box-shadow: 0 2px 10px rgba(255, 126, 126, 0.2);
+  box-shadow: 0 2px 10px rgba(54,209,220,0.2);
 }
 
-/* 助手訊息（左側） */
+/* 助手訊息：對齊左側 */
 .assistant-message {
+  align-self: flex-start; /* 置於左側 */
   background: #fff;
   color: #333;
-  margin-right: auto;
   border: 1px solid #eee;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
 }
 
 /* 訊息動畫 */
@@ -110,7 +112,7 @@ body {
   }
 }
 
-/* 錯誤訊息 */
+/* 錯誤訊息 (可自行保留或調整顏色) */
 .error-message {
   background: linear-gradient(135deg, #FF6B6B, #FF8E8E);
   color: white;
@@ -124,11 +126,11 @@ body {
 
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  75% { transform: translateX(5px); }
+  25%      { transform: translateX(-5px); }
+  75%      { transform: translateX(5px); }
 }
 
-/* 輸入區域 */
+/* 輸入區域：置底、陰影、圓角 */
 #input-area {
   display: flex;
   align-items: center;
@@ -144,7 +146,7 @@ body {
   transform: translateY(-2px);
 }
 
-/* 輸入框（自動撐滿空間，乾淨的邊框設計） */
+/* 輸入框 */
 #userMessage {
   flex: 1;
   padding: 12px 16px;
@@ -172,7 +174,7 @@ body {
 #sendButton {
   min-width: 80px;
   height: 40px;
-  background: linear-gradient(135deg, #ff7e7e, #ffb2b2);
+  background: linear-gradient(135deg, #36D1DC, #5B86E5);
   color: white;
   border: none;
   border-radius: 12px;
@@ -182,7 +184,7 @@ body {
   margin-left: 8px;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 4px 15px rgba(255, 126, 126, 0.3);
+  box-shadow: 0 4px 15px rgba(54,209,220,0.3);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -211,7 +213,7 @@ body {
   transform: translateY(1px);
 }
 
-/* 載入中動畫（打字指示） */
+/* 打字指示 (可選) */
 .typing-indicator {
   display: flex;
   align-items: center;
@@ -223,7 +225,7 @@ body {
 .typing-indicator span {
   width: 6px;
   height: 6px;
-  background: #ff7e7e;
+  background: #5B86E5;
   border-radius: 50%;
   animation: typing 1s infinite;
 }
