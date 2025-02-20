@@ -35,7 +35,6 @@ function sendFinalMedicalReport(finalReport) {
     })
     .catch(error => {
         console.error('Error:', error);
-        showCustomAlert('Failed to send content to Google Docs.');
     });
     console.log("最終醫療敘述已傳送：", finalReport);
 }
