@@ -25,6 +25,15 @@ document.getElementById("sendButton").addEventListener("click", async () => {
     }
 });
 
+document.addEventListener("DOMContentLoaded", () => {
+  const chatLog = document.getElementById("chat-log");
+  const initMsgDiv = document.createElement("div");
+  initMsgDiv.className = "assistant-message";
+  initMsgDiv.textContent = "您好，方便請問有什麼地方不舒服嗎？";
+  chatLog.appendChild(initMsgDiv);
+});
+
+
 // 添加到你的 script.js 文件中
 const textarea = document.getElementById('userMessage');
 
