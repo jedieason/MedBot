@@ -11,7 +11,7 @@ async function sendMessageToLambda(userMessage) {
     };
 
     try {
-        const response = await fetch('https://22guvlu6i8.execute-api.ap-southeast-2.amazonaws.com/default/Med-OpenAI-API', {
+        const response = await fetch('https://22guvlu6i8.execute-api.ap-southeast-2.amazonaws.com/CORSsetting/Med-OpenAI-API', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
