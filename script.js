@@ -38,7 +38,7 @@ window.sendMessage = async function (userMessage) {
             sendFinalMedicalReport(trimmedResponse);
             conversationHistory += "診間助理：感謝您提供完整資訊，我們已完成資料整理。\n";
             const inputArea = document.getElementById("input-area");
-            inputArea.innerHTML = '感謝您提供完整資訊，請稍待片刻等待就診。另外在候位之餘想邀請您<a href="http://www.example.com" target="_blank">點此</a>回饋您的使用體驗！';
+            inputArea.innerHTML = '<p>感謝您提供完整資訊，請稍待片刻等待就診。另外在候位之餘想邀請您<a href="http://www.example.com" target="_blank">點此</a>回饋您的使用體驗！</p>';
             return "感謝您！";
         } else {
             conversationHistory += `診間助理：${trimmedResponse}\n`;
