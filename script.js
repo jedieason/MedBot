@@ -31,7 +31,7 @@ let conversationHistory = [
     });
   
     try {
-      const response = await fetch("https://us-central1-geminiapiformedbot.cloudfunctions.net/chatFunction", {
+      const response = await fetch("https://us-central1-geminiapiformedbot.cloudfunctions.net/geminiFunction", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
