@@ -3,18 +3,14 @@ let conversationHistory = [];
 
 function sendFinalMedicalReport(finalReport) {
     const url = 'https://script.google.com/macros/s/AKfycbypoBJyxKh436VSYk_PFyaWoVuK-BuBezOCkxuhhm28GcR68jHwMyIHK7EG5Gge_SCfhQ/exec';
-    const payload = {
-        conversation: conversationHistory,
-        finalReport: finalReport
-    };
     fetch(url, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: JSON.stringify(payload)
+        body: new URLSearchParams({ content: finalReport })
     })
-    .then(response => response.json())
+    .then(response => response.text())
     .then(data => {
         console.log(data);
     })
@@ -23,6 +19,7 @@ function sendFinalMedicalReport(finalReport) {
     });
     console.log("最終醫療敘述已傳送：", finalReport);
 }
+
 
 // 初始化函數，用於獲取歡迎訊息
 async function initializeChat() {
