@@ -1,4 +1,4 @@
-conversationHistory = [
+let conversationHistory = [
     { role: "assistant", message: "您好，方便請問您的候位號碼與姓名嗎？" }
 ];
 
@@ -28,24 +28,37 @@ function sendFinalMedicalReport(finalReport) {
 window.sendMessage = async function (userMessage) {
     // 新增使用者訊息到聊天歷程中
     conversationHistory.push({ role: "user", message: userMessage });
+    
     try {
+        // 格式化對話歷史符合 Gemini API 要求
+        const formattedConversation = conversationHistory.map(msg => ({
+            role: msg.role, 
+            content: [{ text: msg.message }]
+        }));
+        
+        console.log("發送到後端的對話歷史:", JSON.stringify(formattedConversation));
+        
         const response = await fetch("https://us-central1-geminiapiformedbot.cloudfunctions.net/geminiFunction", {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify({
-                conversation: conversationHistory.map(msg => ({
-                    role: msg.role, 
-                    content: [{ text: msg.message }]
-                }))
+                conversation: formattedConversation
             })
         });
-        if (!response.ok) throw new Error("API 呼叫錯誤");
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`API 呼叫錯誤 (${response.status}): ${errorText}`);
+        }
+        
         const data = await response.json();
         const trimmedResponse = data.response.trim();
 
         if (trimmedResponse.includes("病歷簡介：")) {
             // 回應中含有病歷簡介，先加入系統回應，再傳送最終醫療敘述
-            conversationHistory.push({ role: "診間助理", message: "感謝您提供完整資訊，我們已完成資料整理。" });
+            conversationHistory.push({ role: "assistant", message: "感謝您提供完整資訊，我們已完成資料整理。" });
             sendFinalMedicalReport(trimmedResponse);
             const inputArea = document.getElementById("input-area");
             inputArea.innerHTML = '<p>感謝您提供完整資訊，請稍待片刻等待就診。另外在候位之餘想邀請您<a href="https://forms.gle/Ema6yXHhNHZ6dB6x6" target="_blank">點此</a>回饋您的使用體驗！</p>';
@@ -56,7 +69,7 @@ window.sendMessage = async function (userMessage) {
         }
     } catch (error) {
         console.error("錯誤：", error);
-        throw new Error("產生回應時發生錯誤。");
+        throw new Error(`產生回應時發生錯誤: ${error.message}`);
     }
 };
 
@@ -73,14 +86,27 @@ document.getElementById("sendButton").addEventListener("click", async () => {
     chatLog.scrollTop = chatLog.scrollHeight;
     userMessageInput.value = "";
 
+    // 顯示讀取中...
+    const loadingMsgDiv = document.createElement("div");
+    loadingMsgDiv.className = "assistant-message loading";
+    loadingMsgDiv.textContent = "處理中...";
+    chatLog.appendChild(loadingMsgDiv);
+    chatLog.scrollTop = chatLog.scrollHeight;
+
     try {
         const assistantResponse = await window.sendMessage(userMessage);
+        // 移除讀取訊息
+        chatLog.removeChild(loadingMsgDiv);
+        
         const assistantMsgDiv = document.createElement("div");
         assistantMsgDiv.className = "assistant-message";
         assistantMsgDiv.textContent = assistantResponse;
         chatLog.appendChild(assistantMsgDiv);
         chatLog.scrollTop = chatLog.scrollHeight;
     } catch (error) {
+        // 移除讀取訊息
+        chatLog.removeChild(loadingMsgDiv);
+        
         const errorMsgDiv = document.createElement("div");
         errorMsgDiv.className = "error-message";
         errorMsgDiv.textContent = `錯誤：${error.message}`;
