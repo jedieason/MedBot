@@ -73,12 +73,21 @@ async function initializeChat() {
 }
 
 window.sendMessage = async function (userMessage) {
-    // 新增使用者訊息到聊天歷程中
+    // 將使用者訊息加入 conversationHistory（顯示用）
     conversationHistory.push({ role: "user", message: userMessage });
     
     try {
-        // 格式化對話歷史符合 Gemini API 要求
-        const formattedConversation = conversationHistory.map(msg => ({
+        // 產生一個新的陣列，僅包含送 API 時需要的訊息，過濾掉第一則助理訊息
+        const historyForAPI = conversationHistory.filter((msg, idx) => {
+            // 如果第一則訊息是助理的歡迎訊息，就過濾掉
+            if (idx === 0 && msg.role === "assistant") {
+                return false;
+            }
+            return true;
+        });
+        
+        // 格式化送給 Gemini API 的對話歷史
+        const formattedConversation = historyForAPI.map(msg => ({
             role: msg.role, 
             content: [{ text: msg.message }]
         }));
@@ -104,7 +113,6 @@ window.sendMessage = async function (userMessage) {
         const trimmedResponse = data.response.trim();
 
         if (trimmedResponse.includes("病歷簡介：")) {
-            // 回應中含有病歷簡介，先加入系統回應，再傳送最終醫療敘述
             conversationHistory.push({ role: "assistant", message: "感謝您提供完整資訊，我們已完成資料整理。" });
             sendFinalMedicalReport(trimmedResponse);
             const inputArea = document.getElementById("input-area");
