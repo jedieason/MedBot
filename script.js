@@ -1,5 +1,5 @@
-let conversationHistory = [
-    { role: "診間助理", message: "您好，方便請問您的候位號碼與姓名嗎？" }
+conversationHistory = [
+    { role: "assistant", message: "您好，方便請問您的候位號碼與姓名嗎？" }
 ];
 
 function sendFinalMedicalReport(finalReport) {
@@ -27,16 +27,17 @@ function sendFinalMedicalReport(finalReport) {
 
 window.sendMessage = async function (userMessage) {
     // 新增使用者訊息到聊天歷程中
-    conversationHistory.push({ role: "使用者", message: userMessage });
-    // 產生 prompt 時，依照對話歷程組合字串，結尾補上診間助理的提示
-    const prompt = conversationHistory.map(item => `${item.role}：${item.message}`).join("\n") + "\n診間助理：";
+    conversationHistory.push({ role: "user", message: userMessage });
     try {
         const response = await fetch("https://us-central1-geminiapiformedbot.cloudfunctions.net/geminiFunction", {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ prompt: prompt })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                conversation: conversationHistory.map(msg => ({
+                    role: msg.role, 
+                    content: [{ text: msg.message }]
+                }))
+            })
         });
         if (!response.ok) throw new Error("API 呼叫錯誤");
         const data = await response.json();
@@ -50,7 +51,7 @@ window.sendMessage = async function (userMessage) {
             inputArea.innerHTML = '<p>感謝您提供完整資訊，請稍待片刻等待就診。另外在候位之餘想邀請您<a href="https://forms.gle/Ema6yXHhNHZ6dB6x6" target="_blank">點此</a>回饋您的使用體驗！</p>';
             return "感謝您！";
         } else {
-            conversationHistory.push({ role: "診間助理", message: trimmedResponse });
+            conversationHistory.push({ role: "assistant", message: trimmedResponse });
             return trimmedResponse;
         }
     } catch (error) {
