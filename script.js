@@ -1,6 +1,5 @@
-let conversationHistory = [
-    { role: "assistant", message: "您好，方便請問您的候位號碼與姓名嗎？" }
-];
+// 初始化對話歷史
+let conversationHistory = [];
 
 function sendFinalMedicalReport(finalReport) {
     const url = 'https://script.google.com/macros/s/AKfycbypoBJyxKh436VSYk_PFyaWoVuK-BuBezOCkxuhhm28GcR68jHwMyIHK7EG5Gge_SCfhQ/exec';
@@ -23,6 +22,54 @@ function sendFinalMedicalReport(finalReport) {
         console.error('Error:', error);
     });
     console.log("最終醫療敘述已傳送：", finalReport);
+}
+
+// 初始化函數，用於獲取歡迎訊息
+async function initializeChat() {
+    try {
+        const response = await fetch("https://us-central1-geminiapiformedbot.cloudfunctions.net/geminiFunction", {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                conversation: [
+                    { 
+                        role: 'user', 
+                        content: [{ text: 'INIT_CHAT' }] 
+                    }
+                ]
+            })
+        });
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`API 呼叫錯誤 (${response.status}): ${errorText}`);
+        }
+        
+        const data = await response.json();
+        const welcomeMessage = data.response.trim();
+        
+        // 將歡迎訊息加入對話歷史
+        conversationHistory.push({ role: "assistant", message: welcomeMessage });
+        
+        // 顯示歡迎訊息
+        const chatLog = document.getElementById("chat-log");
+        const welcomeMsgDiv = document.createElement("div");
+        welcomeMsgDiv.className = "assistant-message";
+        welcomeMsgDiv.textContent = welcomeMessage;
+        chatLog.appendChild(welcomeMsgDiv);
+        
+        return welcomeMessage;
+    } catch (error) {
+        console.error("初始化錯誤:", error);
+        const chatLog = document.getElementById("chat-log");
+        const errorMsgDiv = document.createElement("div");
+        errorMsgDiv.className = "error-message";
+        errorMsgDiv.textContent = `初始化錯誤: ${error.message}`;
+        chatLog.appendChild(errorMsgDiv);
+        return "您好，請問有什麼能幫您的嗎？";
+    }
 }
 
 window.sendMessage = async function (userMessage) {
@@ -115,13 +162,8 @@ document.getElementById("sendButton").addEventListener("click", async () => {
     }
 });
 
-document.addEventListener("DOMContentLoaded", () => {
-    const chatLog = document.getElementById("chat-log");
-    const initMsgDiv = document.createElement("div");
-    initMsgDiv.className = "assistant-message";
-    // 初始訊息改自 conversationHistory 陣列
-    initMsgDiv.textContent = conversationHistory[0].message;
-    chatLog.appendChild(initMsgDiv);
+document.addEventListener("DOMContentLoaded", async () => {
+    await initializeChat();
 });
 
 const userMessageInput = document.getElementById("userMessage");
