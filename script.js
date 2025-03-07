@@ -141,7 +141,7 @@ document.getElementById("sendButton").addEventListener("click", async () => {
     // 顯示讀取中...
     const loadingMsgDiv = document.createElement("div");
     loadingMsgDiv.className = "assistant-message loading";
-    loadingMsgDiv.textContent = "處理中...";
+    loadingMsgDiv.textContent = "正在輸入...";
     chatLog.appendChild(loadingMsgDiv);
     chatLog.scrollTop = chatLog.scrollHeight;
 
