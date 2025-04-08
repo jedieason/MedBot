@@ -26,7 +26,7 @@ body {
   flex-direction: column;
   padding: 20px;
   animation: fadeIn 0.5s ease-out;
-  background-color: #f9f9fa;
+  background-color: #7a8569;
 }
 
 #top-bar {
@@ -38,14 +38,14 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #fff;
-  height: 70px;
+  background: #085f79;
+  height: 30px;
   padding: 20px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
 }
 
 #top-bar .logo img {
-  height: 45px;
+  height: 70px;
 }
 
 #top-bar .waiting-number {
@@ -60,8 +60,8 @@ body {
   flex: 1;
   overflow-y: auto;
   padding: 20px;
-  background-color: #fff;
-  border: 1px solid #eee;
+  background-color: rgba(255, 255, 255, 0.8);
+  border: none;
   border-radius: 16px;
   margin-bottom: 20px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
@@ -78,7 +78,7 @@ body {
 #chat-log::-webkit-scrollbar-thumb {
   background: rgba(0, 0, 0, 0.1);
   border-radius: 3px;
-  transition: background 0.3s;
+  transition: background-color 0.3s ease;
 }
 #chat-log::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 0, 0, 0.2);
@@ -98,7 +98,7 @@ body {
 
 .user-message {
   align-self: flex-end;
-  background: linear-gradient(135deg, #36D1DC, #5B86E5);
+  background: linear-gradient(56deg, #0c5c7b, #71654a);
   color: #fff;
   box-shadow: 0 2px 10px rgba(54,209,220,0.2);
 }
@@ -111,30 +111,10 @@ body {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
-@keyframes messageSlide {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
 #input-area {
   display: flex;
   align-items: center;
-  background: #fff;
+  background-color: rgba(255, 255, 255, 0.8);
   border-radius: 20px;
   padding: 8px 16px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.07);
@@ -173,8 +153,8 @@ body {
 #sendButton {
   min-width: 80px;
   height: 40px;
-  background: linear-gradient(135deg, #36D1DC, #5B86E5);
-  color: white;
+  background: linear-gradient(135deg, #085f79, #7a8569);
+  color: rgb(255, 255, 255);
   border: none;
   border-radius: 12px;
   font-weight: 600;
