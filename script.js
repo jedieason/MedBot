@@ -16,12 +16,12 @@ function sendFinalMedicalReport(finalReport) {
     })
     .catch(error => {
         console.error('Error:', error);
+        sendErrorReport(error);
     });
     console.log("最終醫療敘述已傳送：", finalReport);
 }
 
 
-// 初始化函數，用於獲取歡迎訊息
 async function initializeChat() {
     try {
         const response = await fetch("https://us-central1-geminiapiformedbot.cloudfunctions.net/geminiFunction", {
@@ -60,6 +60,7 @@ async function initializeChat() {
         return welcomeMessage;
     } catch (error) {
         console.error("初始化錯誤:", error);
+        sendErrorReport(error);
         const chatLog = document.getElementById("chat-log");
         const errorMsgDiv = document.createElement("div");
         errorMsgDiv.className = "error-message";
@@ -121,7 +122,11 @@ window.sendMessage = async function (userMessage) {
         }
     } catch (error) {
         console.error("錯誤：", error);
-        throw new Error(`產生回應時發生錯誤: ${error.message}`);
+        // throw new Error(`產生回應時發生錯誤: ${error.message}`);
+        // const formattedReport = sendErrorReport(error);
+        // 回傳格式化後的錯誤訊息給前端顯示
+        const formattedReport = sendErrorReport(error);
+        return formattedReport;
     }
 };
 
@@ -156,6 +161,7 @@ document.getElementById("sendButton").addEventListener("click", async () => {
         chatLog.appendChild(assistantMsgDiv);
         chatLog.scrollTop = chatLog.scrollHeight;
     } catch (error) {
+        sendErrorReport(error);
         // 移除讀取訊息
         chatLog.removeChild(loadingMsgDiv);
         
@@ -178,3 +184,38 @@ userMessageInput.addEventListener("keydown", function (event) {
         document.getElementById("sendButton").click();
     }
 });
+
+function sendErrorReport(error) {
+    const now = new Date();
+    const timestamp = now.toLocaleString('zh-TW', { hour12: false });
+    
+    const historyText = conversationHistory
+        .map((msg, idx) => `${idx + 1}. 【${msg.role === 'user' ? '使用者' : '助理'}】 ${msg.message}`)
+        .join('\n');
+
+    const reportContent = [
+        '===== 錯誤回報 =====',
+        `時間：${timestamp}`,
+        `錯誤訊息：${error.message}`,
+        '',
+        '----- 完整對話歷史 -----',
+        historyText,
+        '====================='
+    ].join('\n');
+
+    const url = 'https://script.google.com/macros/s/AKfycbypoBJyxKh436VSYk_PFyaWoVuK-BuBezOCkxuhhm28GcR68jHwMyIHK7EG5Gge_SCfhQ/exec';
+    fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ content: reportContent })
+    })
+    .then(res => res.text())
+    .then(resText => {
+        console.log('已回報錯誤：', resText);
+    })
+    .catch(reportError => {
+        console.error('回報錯誤時發生問題：', reportError);
+    });
+
+    return reportContent;
+}
