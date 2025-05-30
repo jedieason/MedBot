@@ -1,25 +1,85 @@
-// 初始化對話歷史
-let conversationHistory = [];
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
+import { getDatabase, ref, set } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js';
+const firebaseConfig = {
+    apiKey: "AIzaSyChdYY6AdKToEyv194bJOdAIx00ykRCtDE",
+    authDomain: "geminiapiformedbot.firebaseapp.com",
+    databaseURL: "https://geminiapiformedbot-default-rtdb.firebaseio.com",
+    projectId: "geminiapiformedbot",
+    storageBucket: "geminiapiformedbot.firebasestorage.app",
+    messagingSenderId: "520520790517",
+    appId: "1:520520790517:web:24f30bf0b9999dafdbb0bc",
+    measurementId: "G-BCJJ36CS4S"
+};
 
-function sendFinalMedicalReport(finalReport) {
-    const url = 'https://script.google.com/macros/s/AKfycbypoBJyxKh436VSYk_PFyaWoVuK-BuBezOCkxuhhm28GcR68jHwMyIHK7EG5Gge_SCfhQ/exec';
-    fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({ content: finalReport })
-    })
-    .then(response => response.text())
-    .then(data => {
-        console.log(data);
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        sendErrorReport(error);
+const app = initializeApp(firebaseConfig);
+const database = getDatabase(app);
+
+async function sendFinalMedicalReport(finalReport) {
+    const reportObject = {
+        "候位號碼": "",
+        "姓名": "",
+        "病徵": "",
+        "發病部位": "",
+        "發病日期": "",
+        "症狀性質": "",
+        "症狀程度": "",
+        "誘因與緩解因素": "",
+        "症狀變化": "",
+        "相關症狀": "",
+        "相關個人與家族病史": "",
+        "其他疑問": "",
+        "初步診斷": ""
+    };
+
+    // 按行分割傳入的報告字串
+    const lines = finalReport.split('\n');
+    lines.forEach(line => {
+        // 使用正則表達式分割鍵和值，處理全形或半形冒號
+        const parts = line.split(/：|:/);
+        if (parts.length >= 2) {
+            const key = parts[0].trim(); // 取得鍵，並去除前後空白
+            // 將冒號後面的所有部分合併為值，並保留值中可能存在的冒號
+            const value = parts.slice(1).join(parts[0].includes('：') ? '：' : ':').trim();
+
+            // 檢查報告物件中是否有此鍵，若有則賦值
+            // 這邊的邏輯會自動處理新增的 "候位號碼" (如果 finalReport 內有 "候位號碼：xxx" 的內容)
+            if (reportObject.hasOwnProperty(key)) {
+                reportObject[key] = value;
+            }
+        }
     });
-    console.log("最終醫療敘述已傳送：", finalReport);
+
+    // 從 reportObject 中取得所需資訊
+    const 時間戳 = Date.now();
+    const 候位號碼_值 = reportObject["候位號碼"] || "未知候位號碼"; // 如果沒取到候位號碼，給個預設值
+    const 姓名_值 = reportObject["姓名"] || "未知姓名";         // 如果沒取到姓名，給個預設值
+
+    // 產生新的病歷識別碼，格式為：時間戳｜候位號碼｜姓名
+    const 病歷識別碼 = `${時間戳}｜${候位號碼_值}｜${姓名_值}`;
+
+    try {
+        // 假設 'database', 'ref', 'set' 已經正確配置
+        // import { getDatabase, ref, set } from "firebase/database";
+        // const database = getDatabase();
+
+        // 建立 Firebase Realtime Database 的參照路徑
+        const reportRef = ref(database, `medical_reports/${病歷識別碼}`);
+        // 將報告物件儲存到 Firebase
+        await set(reportRef, reportObject);
+        console.log(`醫療報告已成功儲存到 Firebase。路徑: medical_reports/${病歷識別碼} 💯`);
+        console.log("儲存的資料：", reportObject);
+
+    } catch (error) {
+        console.error('儲存醫療報告到 Firebase 時發生錯誤:', error);
+        // 如果有錯誤回報函數，則呼叫它
+        if (typeof sendErrorReport === 'function') {
+            sendErrorReport(new Error(`Firebase 儲存錯誤: ${error.message} (病歷識別碼: ${病歷識別碼})`));
+        }
+    }
 }
+
+
+let conversationHistory = [];
 
 
 async function initializeChat() {
@@ -143,10 +203,12 @@ document.getElementById("sendButton").addEventListener("click", async () => {
     chatLog.scrollTop = chatLog.scrollHeight;
     userMessageInput.value = "";
 
-    // 顯示讀取中...
     const loadingMsgDiv = document.createElement("div");
     loadingMsgDiv.className = "assistant-message loading";
-    loadingMsgDiv.textContent = "正在輸入...";
+    // 正在輸入修改開始
+    loadingMsgDiv.innerHTML = '<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span>';
+    // 正在輸入修改結束
+    // loadingMsgDiv.textContent = "正在輸入...";
     chatLog.appendChild(loadingMsgDiv);
     chatLog.scrollTop = chatLog.scrollHeight;
 
