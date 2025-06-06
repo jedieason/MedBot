@@ -37,16 +37,19 @@ function formatDate(ts) {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, '0');
   const day = String(d.getDate()).padStart(2, '0');
-  return `${y}/${m}/${day}`;
+  const h = String(d.getHours()).padStart(2, '0');
+  const min = String(d.getMinutes()).padStart(2, '0');
+  return `${y}/${m}/${day} ${h}:${min}`;
 }
 
 function renderDetails(id, report) {
   const ts = parseId(id);
-  let html = `<p><strong>提交時間：</strong>${formatDate(ts)}</p>`;
+  let html = `<div class="detail-item"><strong>提交時間：</strong>${formatDate(ts)}</div>`;
   Object.keys(report).forEach(key => {
-    if (key === '姓名' || key === '候位號碼') return;
-    html += `<p><strong>${key}：</strong>${report[key]}</p>`;
+    if (key === '姓名' || key === '候位號碼' || key === '備註') return;
+    html += `<div class="detail-item"><strong>${key}：</strong>${report[key]}</div>`;
   });
+  html += `<div class="note"><strong>備註：</strong>${report['備註'] || ''}</div>`;
   return html;
 }
 
@@ -82,22 +85,24 @@ function loadReports() {
     Object.keys(data).forEach(id => {
       const report = data[id];
       const tr = document.createElement('tr');
+      tr.className = 'report-row';
+      tr.dataset.id = id;
       const ts = parseId(id);
       tr.innerHTML = `
         <td>${formatDate(ts)}</td>
         <td>${report['姓名'] || ''}</td>
-        <td>${report['候位號碼'] || ''}</td>
-        <td>
-          <button class="view-btn" data-id="${id}">查看</button>
-          <button class="delete-btn" data-id="${id}">刪除</button>
+        <td class="action-cell">
+          <button class="delete-btn" data-id="${id}" title="刪除">🗑️</button>
         </td>
       `;
       tableBody.appendChild(tr);
     });
 
-    tableBody.querySelectorAll('.view-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const id = btn.dataset.id;
+
+    tableBody.querySelectorAll('.report-row').forEach(row => {
+      row.addEventListener('click', (e) => {
+        if (e.target.classList.contains('delete-btn')) return;
+        const id = row.dataset.id;
         const report = data[id];
         if (openedId === id) {
           detailDiv.innerHTML = '';
@@ -105,7 +110,7 @@ function loadReports() {
           openedId = null;
         } else {
           detailDiv.innerHTML = renderDetails(id, report);
-          detailDiv.style.display = 'block';
+          detailDiv.style.display = 'flex';
           openedId = id;
         }
       });
