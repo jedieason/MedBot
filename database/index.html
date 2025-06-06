@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>病歷管理</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="top-bar">
+        <a class="logo" href="https://yoursclinic.com.tw" target="_blank">
+            <img src="../clinic-logo.png" alt="診所Logo">
+        </a>
+        <button id="logout-btn" style="display:none;">登出</button>
+    </div>
+    <div id="login-section">
+        <button id="login-btn">使用 Google 登入</button>
+    </div>
+    <div id="content-section" style="display:none;">
+        <table id="reports-table">
+            <thead>
+                <tr>
+                    <th>識別碼</th>
+                    <th>姓名</th>
+                    <th>候位號碼</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody id="reports-table-body"></tbody>
+        </table>
+        <pre id="detail"></pre>
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
