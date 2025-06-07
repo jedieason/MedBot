@@ -1,6 +1,6 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
 import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js';
-import { getDatabase, ref, onValue, remove } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js';
+import { getDatabase, ref, onValue, remove, update } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js';
 
 const firebaseConfig = {
     apiKey: "AIzaSyChdYY6AdKToEyv194bJOdAIx00ykRCtDE",
@@ -22,7 +22,7 @@ const loginBtn = document.getElementById('login-btn');
 const logoutBtn = document.getElementById('logout-btn');
 const loginSection = document.getElementById('login-section');
 const contentSection = document.getElementById('content-section');
-const tableBody = document.getElementById('reports-table-body');
+const cardsContainer = document.getElementById('cards-container');
 const detailDiv = document.getElementById('detail');
 let openedId = null;
 
@@ -49,7 +49,13 @@ function renderDetails(id, report) {
     if (key === '姓名' || key === '候位號碼' || key === '備註') return;
     html += `<div class="detail-item"><strong>${key}：</strong>${report[key]}</div>`;
   });
-  html += `<div class="note"><strong>備註：</strong>${report['備註'] || ''}</div>`;
+  html += `
+    <div class="note">
+      <strong>備註：</strong>
+      <textarea id="note-text" rows="4" placeholder="輸入備註...">${report['備註'] || ''}</textarea>
+      <button id="save-note-btn" class="save-note-btn">儲存備註</button>
+    </div>
+  `;
   return html;
 }
 
@@ -71,7 +77,7 @@ onAuthStateChanged(auth, (user) => {
     loginSection.style.display = 'flex';
     contentSection.style.display = 'none';
     logoutBtn.style.display = 'none';
-    tableBody.innerHTML = '';
+    cardsContainer.innerHTML = '';
     detailDiv.innerHTML = '';
     detailDiv.style.display = 'none';
   }
@@ -80,29 +86,26 @@ onAuthStateChanged(auth, (user) => {
 function loadReports() {
   const reportsRef = ref(db, 'medical_reports');
   onValue(reportsRef, (snapshot) => {
-    tableBody.innerHTML = '';
+    cardsContainer.innerHTML = '';
     const data = snapshot.val() || {};
     Object.keys(data).forEach(id => {
       const report = data[id];
-      const tr = document.createElement('tr');
-      tr.className = 'report-row';
-      tr.dataset.id = id;
+      const card = document.createElement('div');
+      card.className = 'report-card';
+      card.dataset.id = id;
       const ts = parseId(id);
-      tr.innerHTML = `
-        <td>${formatDate(ts)}</td>
-        <td>${report['姓名'] || ''}</td>
-        <td class="action-cell">
-          <button class="delete-btn" data-id="${id}" title="刪除">🗑️</button>
-        </td>
+      card.innerHTML = `
+        <div><strong>${report['姓名'] || ''}</strong></div>
+        <div class="time">${formatDate(ts)}</div>
+        <button class="delete-btn" data-id="${id}" title="刪除">🗑️</button>
       `;
-      tableBody.appendChild(tr);
+      cardsContainer.appendChild(card);
     });
 
-
-    tableBody.querySelectorAll('.report-row').forEach(row => {
-      row.addEventListener('click', (e) => {
+    cardsContainer.querySelectorAll('.report-card').forEach(card => {
+      card.addEventListener('click', (e) => {
         if (e.target.classList.contains('delete-btn')) return;
-        const id = row.dataset.id;
+        const id = card.dataset.id;
         const report = data[id];
         if (openedId === id) {
           detailDiv.innerHTML = '';
@@ -112,11 +115,12 @@ function loadReports() {
           detailDiv.innerHTML = renderDetails(id, report);
           detailDiv.style.display = 'flex';
           openedId = id;
+          attachNoteHandler(id);
         }
       });
     });
 
-    tableBody.querySelectorAll('.delete-btn').forEach(btn => {
+    cardsContainer.querySelectorAll('.delete-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const id = btn.dataset.id;
         if (confirm('確定要刪除這筆資料嗎？')) {
@@ -124,5 +128,15 @@ function loadReports() {
         }
       });
     });
+  });
+}
+
+function attachNoteHandler(id) {
+  const saveBtn = document.getElementById('save-note-btn');
+  if (!saveBtn) return;
+  saveBtn.addEventListener('click', () => {
+    const note = document.getElementById('note-text').value;
+    update(ref(db, 'medical_reports/' + id), { '備註': note })
+      .catch(err => console.error('備註更新失敗', err));
   });
 }
