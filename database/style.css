@@ -104,7 +104,8 @@ button {
   margin-top: 6px;
   padding: 8px;
   border: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: 10px;
+  font-size: 1rem;
   resize: vertical;
 }
 
@@ -115,6 +116,7 @@ button {
   border-radius: 4px;
   background: linear-gradient(135deg, #085f79, #7a8569);
   color: #fff;
+  font-size: 1rem;
   border: none;
   cursor: pointer;
 }
