@@ -21,6 +21,7 @@ const provider = new GoogleAuthProvider();
 const loginBtn = document.getElementById('login-btn');
 const logoutBtn = document.getElementById('logout-btn');
 const loginSection = document.getElementById('login-section');
+const loginBox = document.getElementById('login-box');
 const contentSection = document.getElementById('content-section');
 const cardsContainer = document.getElementById('cards-container');
 const detailDiv = document.getElementById('detail');
@@ -69,12 +70,12 @@ logoutBtn.addEventListener('click', () => {
 
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    loginSection.style.display = 'none';
+    loginBox.style.display = 'none';
     contentSection.style.display = 'block';
     logoutBtn.style.display = 'inline-block';
     loadReports();
   } else {
-    loginSection.style.display = 'flex';
+    loginBox.style.display = 'flex';
     contentSection.style.display = 'none';
     logoutBtn.style.display = 'none';
     cardsContainer.innerHTML = '';
