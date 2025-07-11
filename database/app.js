@@ -98,7 +98,7 @@ function loadReports() {
       card.innerHTML = `
         <div><strong>${report['姓名'] || ''}</strong></div>
         <div class="time">${formatDate(ts)}</div>
-        <button class="delete-btn" data-id="${id}" title="刪除">🗑️</button>
+        <button class="delete-btn" data-id="${id}" title="刪除"></button>
       `;
       cardsContainer.appendChild(card);
     });
