@@ -79,7 +79,7 @@ async function sendFinalMedicalReport(finalReport) {
 let conversationHistory = [];
 
 
-async function initializeChat() {
+async function initializeChat(initialMessage) {
     try {
         const response = await fetch("https://us-central1-geminiapiformedbot.cloudfunctions.net/geminiFunction", {
             method: 'POST',
@@ -88,9 +88,9 @@ async function initializeChat() {
             },
             body: JSON.stringify({
                 conversation: [
-                    { 
-                        role: 'user', 
-                        content: [{ text: 'INIT_CHAT' }] 
+                    {
+                        role: 'user',
+                        content: [{ text: initialMessage }]
                     }
                 ]
             })
@@ -232,8 +232,23 @@ document.getElementById("sendButton").addEventListener("click", async () => {
     }
 });
 
-document.addEventListener("DOMContentLoaded", async () => {
-    await initializeChat();
+document.addEventListener("DOMContentLoaded", () => {
+    const langScreen = document.getElementById("language-screen");
+    const chatContainer = document.getElementById("chat-container");
+    const btnZh = document.getElementById("btn-chinese");
+    const btnEn = document.getElementById("btn-english");
+
+    btnZh.addEventListener("click", async () => {
+        langScreen.style.display = "none";
+        chatContainer.style.display = "flex";
+        await initializeChat("使用者選擇使用中文回答");
+    });
+
+    btnEn.addEventListener("click", async () => {
+        langScreen.style.display = "none";
+        chatContainer.style.display = "flex";
+        await initializeChat("User sets the language to English");
+    });
 });
 
 const userMessageInput = document.getElementById("userMessage");
