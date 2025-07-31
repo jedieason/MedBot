@@ -237,13 +237,13 @@ document.addEventListener("DOMContentLoaded", () => {
     btnZh.addEventListener("click", async () => {
         langScreen.style.display = "none";
         chatContainer.style.display = "flex";
-        await initializeChat("使用者選擇使用中文回答");
+        await initializeChat("系統語言設定：僅使用正體中文（臺灣）回答。");
     });
 
     btnEn.addEventListener("click", async () => {
         langScreen.style.display = "none";
         chatContainer.style.display = "flex";
-        await initializeChat("User sets the language to English");
+        await initializeChat("Language setting: only answer with English");
     });
 });
 
