@@ -47,7 +47,7 @@ function renderDetails(id, report) {
   const ts = parseId(id);
   let html = `<div class="detail-item"><strong>提交時間：</strong>${formatDate(ts)}</div>`;
   Object.keys(report).forEach(key => {
-    if (key === '姓名' || key === '備註') return;
+    if (key === '備註') return;
     html += `<div class="detail-item"><strong>${key}：</strong>${report[key]}</div>`;
   });
   html += `
