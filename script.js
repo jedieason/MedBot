@@ -14,6 +14,12 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 
+// 使用者選擇的語言（zh | en），預設中文
+let selectedLang = "zh";
+
+let conversationHistory = [];
+
+
 async function sendFinalMedicalReport(finalReport) {
     const reportObject = {
         "姓名": "",
@@ -72,8 +78,6 @@ async function sendFinalMedicalReport(finalReport) {
 }
 
 
-let conversationHistory = [];
-
 
 async function initializeChat(initialMessage) {
     try {
@@ -88,7 +92,8 @@ async function initializeChat(initialMessage) {
                         role: 'user',
                         content: [{ text: initialMessage }]
                     }
-                ]
+                ],
+                lang: selectedLang
             })
         });
         
@@ -151,7 +156,8 @@ window.sendMessage = async function (userMessage) {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                conversation: formattedConversation
+                conversation: formattedConversation,
+                lang: selectedLang
             })
         });
         
@@ -235,12 +241,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnEn = document.getElementById("btn-english");
 
     btnZh.addEventListener("click", async () => {
+        selectedLang = "zh";
         langScreen.style.display = "none";
         chatContainer.style.display = "flex";
         await initializeChat("系統語言設定：僅使用正體中文（臺灣）回答。");
     });
 
     btnEn.addEventListener("click", async () => {
+        selectedLang = "en";
         langScreen.style.display = "none";
         chatContainer.style.display = "flex";
         await initializeChat("Language setting: only answer with English");
