@@ -39,7 +39,6 @@ async function sendFinalMedicalReport(finalReport) {
             const value = parts.slice(1).join(parts[0].includes('：') ? '：' : ':').trim();
 
             // 檢查報告物件中是否有此鍵，若有則賦值
-            // 這邊的邏輯會自動處理新增的 "候位號碼" (如果 finalReport 內有 "候位號碼：xxx" 的內容)
             if (reportObject.hasOwnProperty(key)) {
                 reportObject[key] = value;
             }
@@ -48,11 +47,8 @@ async function sendFinalMedicalReport(finalReport) {
 
     // 從 reportObject 中取得所需資訊
     const 時間戳 = Date.now();
-    const 候位號碼_值 = reportObject["候位號碼"] || "未知候位號碼"; // 如果沒取到候位號碼，給個預設值
     const 姓名_值 = reportObject["姓名"] || "未知姓名";         // 如果沒取到姓名，給個預設值
-
-    // 產生新的病歷識別碼，格式為：時間戳｜候位號碼｜姓名
-    const 病歷識別碼 = `${時間戳}｜${候位號碼_值}｜${姓名_值}`;
+    const 病歷識別碼 = `${時間戳}｜${姓名_值}`;
 
     try {
         // 假設 'database', 'ref', 'set' 已經正確配置
