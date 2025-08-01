@@ -21,6 +21,7 @@ let conversationHistory = [];
 
 
 async function sendFinalMedicalReport(finalReport) {
+    console.log("🚑 [DEBUG] Received finalReport ▼\n", finalReport);
     const reportObject = {
         "姓名": "",
         "就診原因／醫師協助期待": "",
@@ -34,22 +35,71 @@ async function sendFinalMedicalReport(finalReport) {
         "初步診斷": ""
     };
 
-    // 按行分割傳入的報告字串
-    const lines = finalReport.split('\n');
-    lines.forEach(line => {
-        // 使用正則表達式分割鍵和值，處理全形或半形冒號
-        const parts = line.split(/：|:/);
-        if (parts.length >= 2) {
-            const key = parts[0].trim(); // 取得鍵，並去除前後空白
-            // 將冒號後面的所有部分合併為值，並保留值中可能存在的冒號
-            const value = parts.slice(1).join(parts[0].includes('：') ? '：' : ':').trim();
-
-            // 檢查報告物件中是否有此鍵，若有則賦值
-            if (reportObject.hasOwnProperty(key)) {
-                reportObject[key] = value;
-            }
+    // === 新增：若回傳包含 XML，嘗試抽取並解析 ===
+    let xmlString = null;
+    const directXML = finalReport.trim().startsWith('<');
+    if (directXML) {
+        xmlString = finalReport.trim();
+    } else {
+        // 嘗試抓取 <medical_record> ... </medical_record>
+        const startIdx = finalReport.indexOf("<medical_record");
+        const endIdx = finalReport.indexOf("</medical_record>");
+        if (startIdx !== -1 && endIdx !== -1) {
+            xmlString = finalReport.slice(startIdx, endIdx + "</medical_record>".length);
         }
-    });
+    }
+
+    if (xmlString) {
+        console.log("📄 [DEBUG] Extracted XML ▼\n", xmlString);
+        try {
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(xmlString, "application/xml");
+            // XML 標籤 → reportObject 鍵 的對應
+            const xmlToObjectKey = {
+                "姓名": "姓名",
+                "就診原因_醫師協助期待": "就診原因／醫師協助期待",
+                "情緒_睡眠_自律神經症狀及持續時間": "情緒／睡眠／自律神經症狀及持續時間",
+                "壓力或影響情緒事件經過": "壓力或影響情緒事件經過",
+                "其他不舒服症狀": "其他不舒服症狀",
+                "既往內科慢性病史": "既往內科慢性病史（如氣喘、糖尿病、高血壓、肝炎等）：",
+                "居住狀況與家庭組成": "居住狀況與家庭組成",
+                "物質使用習慣_平均每日用量": "吸菸／飲酒／檳榔／其他物質習慣及平均每日用量",
+                "其他想告訴醫師事項": "其他想告訴醫師事項",
+                "初步診斷": "初步診斷"
+            };
+
+            Object.entries(xmlToObjectKey).forEach(([tag, key]) => {
+                const elem = xmlDoc.getElementsByTagName(tag)[0];
+                if (elem && elem.textContent != null) {
+                    reportObject[key] = elem.textContent.trim();
+                }
+            });
+        } catch (xmlErr) {
+            console.error("XML 解析錯誤:", xmlErr);
+            /* 若失敗，會在下方備援的行分割邏輯處理 */
+        }
+    }
+
+    if (!xmlString) {
+        // 按行分割傳入的報告字串（純文字格式備援）
+        const lines = finalReport.split('\n');
+        lines.forEach(line => {
+            // 使用正則表達式分割鍵和值，處理全形或半形冒號
+            const parts = line.split(/：|:/);
+            if (parts.length >= 2) {
+                const key = parts[0].trim(); // 取得鍵，並去除前後空白
+                // 將冒號後面的所有部分合併為值，並保留值中可能存在的冒號
+                const value = parts.slice(1).join(parts[0].includes('：') ? '：' : ':').trim();
+
+                // 檢查報告物件中是否有此鍵，若有則賦值
+                if (reportObject.hasOwnProperty(key)) {
+                    reportObject[key] = value;
+                }
+            }
+        });
+    }
+
+    console.log("🩺 [DEBUG] Parsed reportObject ▼\n", reportObject);
 
     // 從 reportObject 中取得所需資訊
     const 時間戳 = Date.now();
@@ -80,6 +130,13 @@ async function sendFinalMedicalReport(finalReport) {
 
 
 async function initializeChat(initialMessage) {
+    // 先顯示 loading 動畫
+    const chatLog = document.getElementById("chat-log");
+    const loadingMsgDiv = document.createElement("div");
+    loadingMsgDiv.className = "assistant-message loading";
+    loadingMsgDiv.innerHTML = '<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span>';
+    chatLog.appendChild(loadingMsgDiv);
+    chatLog.scrollTop = chatLog.scrollHeight;
     try {
         const response = await fetch("https://us-central1-geminiapiformedbot.cloudfunctions.net/geminiFunction", {
             method: 'POST',
@@ -103,13 +160,14 @@ async function initializeChat(initialMessage) {
         }
         
         const data = await response.json();
+        // 取得回應後移除 loading
+        chatLog.removeChild(loadingMsgDiv);
         const welcomeMessage = data.response.trim();
         
         // 將歡迎訊息加入對話歷史
         conversationHistory.push({ role: "assistant", message: welcomeMessage });
         
         // 顯示歡迎訊息
-        const chatLog = document.getElementById("chat-log");
         const welcomeMsgDiv = document.createElement("div");
         welcomeMsgDiv.className = "assistant-message";
         welcomeMsgDiv.textContent = welcomeMessage;
@@ -117,9 +175,10 @@ async function initializeChat(initialMessage) {
         
         return welcomeMessage;
     } catch (error) {
+        // 發生錯誤時也要移除 loading
+        chatLog.removeChild(loadingMsgDiv);
         console.error("初始化錯誤:", error);
         sendErrorReport(error);
-        const chatLog = document.getElementById("chat-log");
         const errorMsgDiv = document.createElement("div");
         errorMsgDiv.className = "error-message";
         errorMsgDiv.textContent = `初始化錯誤: ${error.message}`;
@@ -169,21 +228,30 @@ window.sendMessage = async function (userMessage) {
         const data = await response.json();
         const trimmedResponse = data.response.trim();
 
-        if (trimmedResponse.includes("病歷簡介：")) {
-            conversationHistory.push({ role: "assistant", message: "感謝您提供完整資訊，我們已完成資料整理。" });
+        if (trimmedResponse.includes("<medical_record") || trimmedResponse.includes("病歷簡介：")) {
+            const thankMsgZh = "感謝您提供完整資訊，我們已完成資料整理。";
+            const thankMsgEn = "Thank you for providing all the information. We've finished processing your data.";
+
+            const waitingHtmlZh = '<p>感謝您提供完整資訊，請稍待片刻等待就診。另外在候位之餘想邀請您<a href="https://forms.gle/Ema6yXHhNHZ6dB6x6" target="_blank">點此</a>回饋您的使用體驗！</p>';
+            const waitingHtmlEn = '<p>Thank you for providing all the information. Please wait while we arrange your consultation. Meanwhile, feel free to <a href="https://forms.gle/UrJjiA98sL4FzsKs9" target="_blank">leave feedback about your experience here</a>!</p>';
+
+            const thankDisplay = selectedLang === "en" ? thankMsgEn : thankMsgZh;
+            const waitingHtml   = selectedLang === "en" ? waitingHtmlEn : waitingHtmlZh;
+            const shortReturn   = selectedLang === "en" ? "Thank you!" : "感謝您！";
+
+            conversationHistory.push({ role: "assistant", message: thankDisplay });
             sendFinalMedicalReport(trimmedResponse);
+
             const inputArea = document.getElementById("input-area");
-            inputArea.innerHTML = '<p>感謝您提供完整資訊，請稍待片刻等待就診。另外在候位之餘想邀請您<a href="https://forms.gle/Ema6yXHhNHZ6dB6x6" target="_blank">點此</a>回饋您的使用體驗！</p>';
-            return "感謝您！";
+            inputArea.innerHTML = waitingHtml;
+
+            return shortReturn;
         } else {
             conversationHistory.push({ role: "assistant", message: trimmedResponse });
             return trimmedResponse;
         }
     } catch (error) {
         console.error("錯誤：", error);
-        // throw new Error(`產生回應時發生錯誤: ${error.message}`);
-        // const formattedReport = sendErrorReport(error);
-        // 回傳格式化後的錯誤訊息給前端顯示
         const formattedReport = sendErrorReport(error);
         return formattedReport;
     }
