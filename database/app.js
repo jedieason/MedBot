@@ -16,7 +16,10 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
+
 const provider = new GoogleAuthProvider();
+// 只用「第一個字」決定欄位顯示順序，避免因字串差異導致排序失效
+const firstCharOrder = ['姓', '就', '情', '壓', '其', '既', '居', '物', '其', '初'];
 
 const loginBtn = document.getElementById('login-btn');
 const logoutBtn = document.getElementById('logout-btn');
@@ -45,11 +48,24 @@ function formatDate(ts) {
 
 function renderDetails(id, report) {
   const ts = parseId(id);
+  // 先顯示提交時間
   let html = `<div class="detail-item"><strong>提交時間：</strong>${formatDate(ts)}</div>`;
-  Object.keys(report).forEach(key => {
-    if (key === '備註') return;
+
+  // 取得除了「備註」以外的所有欄位並依首字順序排列
+  const sortedKeys = Object.keys(report)
+    .filter(k => k !== '備註')
+    .sort((a, b) => {
+      const ia = firstCharOrder.indexOf(a.charAt(0));
+      const ib = firstCharOrder.indexOf(b.charAt(0));
+      return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
+    });
+
+  // 依序渲染欄位
+  sortedKeys.forEach(key => {
     html += `<div class="detail-item"><strong>${key}：</strong>${report[key]}</div>`;
   });
+
+  // 備註區域
   html += `
     <div class="note">
       <strong>備註：</strong>
